@@ -1,9 +1,9 @@
 class TaskManager {
-    constructor() {
-      this.taskList = JSON.parse(localStorage.getItem('tasks')) || [];
-      this.storageKey = 'tasks';
-    }
-  
+  constructor() {
+    this.taskList = JSON.parse(localStorage.getItem('tasks')) || [];
+    this.storageKey = 'tasks';
+  }
+
     createTask = (description) => {
       const newTask = {
         description,
@@ -13,7 +13,7 @@ class TaskManager {
       this.taskList.push(newTask);
       this.saveTasks();
     }
-  
+
     displayWindow = (task) => `
       <div class="todoactivities" data-task-index="${task.index}">
         <label for="Item${task.index}" class="tasks-list">
@@ -27,7 +27,7 @@ class TaskManager {
         </div>
       </div>
     `
-  
+
     loadCheckBoxes = () => {
       const checkBoxes = document.querySelectorAll('.box');
       checkBoxes.forEach((box) => {
@@ -43,7 +43,7 @@ class TaskManager {
         });
       });
     }
-  
+
     completionState = (parentIndex) => {
       for (let i = 0; i < this.taskList.length; i += 1) {
         if (this.taskList[i].index === parentIndex + 1) {
@@ -59,7 +59,7 @@ class TaskManager {
         }
       }
     }
-  
+
     loadActivities = () => {
       const activitiesListSection = document.getElementById('activities-list');
       for (let i = 0; i < this.taskList.length; i += 1) {
@@ -70,7 +70,7 @@ class TaskManager {
       }
       this.loadCheckBoxes();
     }
-  
+
     deleteTask = (taskId) => {
       this.taskList.splice(taskId, 1);
       for (let i = taskId; i < this.taskList.length; i += 1) {
@@ -78,69 +78,67 @@ class TaskManager {
       }
       this.saveTasks();
     }
-  
+
     upDateTask = (taskId, newDescription) => {
       this.taskList[taskId].description = newDescription;
       this.saveTasks();
       window.location.reload();
     }
-  
+
     saveTasks = () => {
       localStorage.setItem(this.storageKey, JSON.stringify(this.taskList));
     }
+}
+
+const taskManager = new TaskManager();
+taskManager.loadActivities();
+
+const activitiesInput = document.getElementById('activities-input');
+const addActivityBtn = document.getElementById('add-activity-btn');
+
+addActivityBtn.addEventListener('click', () => {
+  const activityValue = activitiesInput.value;
+  if (activityValue !== '') {
+    window.location.reload();
+    taskManager.createTask(activityValue);
+    activitiesInput.value = '';
   }
-  
-  const taskManager = new TaskManager();
-  taskManager.loadActivities();
-  
-  const activitiesInput = document.getElementById('activities-input');
-  const addActivityBtn = document.getElementById('add-activity-btn');
-  
-  addActivityBtn.addEventListener('click', () => {
+});
+
+activitiesInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
     const activityValue = activitiesInput.value;
     if (activityValue !== '') {
       window.location.reload();
       taskManager.createTask(activityValue);
       activitiesInput.value = '';
     }
-  });
-  
-  activitiesInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      const activityValue = activitiesInput.value;
-      if (activityValue !== '') {
-        window.location.reload();
-        taskManager.createTask(activityValue);
-        activitiesInput.value = '';
-      }
-    }
-  });
-  
-  const deleteButton = document.querySelectorAll('.trash');
-  deleteButton.forEach((button) => {
-    button.addEventListener('click', (e) => {
-      const taskId = parseInt(e.target.parentElement.parentElement.id, 10);
-      //const taskId = taskManager.taskList.findIndex((task) => task.index === parseInt(e.target.parentElement.parentElement.dataset.taskIndex, 10));
-      taskManager.deleteTask(taskId);
-      window.location.reload();
-    });
-  });
-  
-  const activityField = document.querySelectorAll('.li-activity');
-  activityField.forEach((field, i) => {
-    field.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        const newDescription = e.target.value;
-        taskManager.upDateTask(i, newDescription);
-      }
-    });
-  });
-  
-  
-  const clearButton = document.getElementById('clear-button');
-  clearButton.addEventListener('click', () => {
-    taskManager.taskList = taskManager.taskList.filter((task) => !task.completed);
-    taskManager.saveTasks();
+  }
+});
+
+const deleteButton = document.querySelectorAll('.trash');
+deleteButton.forEach((button) => {
+  button.addEventListener('click', (e) => {
+    const taskId = parseInt(e.target.parentElement.parentElement.id, 10);
+    // const taskId = taskManager.taskList.findIndex((task) => task.index === parseInt(e.target.parentElement.parentElement.dataset.taskIndex, 10));
+    taskManager.deleteTask(taskId);
     window.location.reload();
   });
-  
+});
+
+const activityField = document.querySelectorAll('.li-activity');
+activityField.forEach((field, i) => {
+  field.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const newDescription = e.target.value;
+      taskManager.upDateTask(i, newDescription);
+    }
+  });
+});
+
+const clearButton = document.getElementById('clear-button');
+clearButton.addEventListener('click', () => {
+  taskManager.taskList = taskManager.taskList.filter((task) => !task.completed);
+  taskManager.saveTasks();
+  window.location.reload();
+});
